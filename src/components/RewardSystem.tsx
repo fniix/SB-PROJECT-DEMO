@@ -84,12 +84,25 @@ export default function RewardSystem({ bookingId, studentName = 'Student', role 
     setSending(reward.type)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      await supabase.from('session_rewards').insert({
-        booking_id:  bookingId,
-        given_by:    user?.id,
+      const newEntry: ReceivedReward = {
+        id: `rew-${Date.now()}`,
         reward_type: reward.type,
-        message:     `${reward.emoji} Well done! ${reward.label}`,
+        message: `${reward.emoji} Well done! ${reward.label}`,
+        created_at: new Date().toISOString(),
+      }
+      await supabase.from('session_rewards').insert({
+        id: newEntry.id,
+        booking_id: bookingId,
+        given_by: user?.id,
+        reward_type: reward.type,
+        message: newEntry.message,
       })
+      setRewards(prev => [newEntry, ...prev])
+      if (reward.type === 'star') {
+        setSessionStars(s => s + 1)
+      }
+      setCelebrate(reward.type)
+      setTimeout(() => setCelebrate(null), 3500)
       setJustSent(reward.type)
       setTimeout(() => setJustSent(null), 2000)
     } finally {

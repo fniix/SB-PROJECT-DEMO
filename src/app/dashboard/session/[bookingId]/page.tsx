@@ -30,13 +30,13 @@ export default function LiveSessionPage() {
   const [booking, setBooking] = useState<BookingData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [elapsed, setElapsed] = useState(0)
-  const [sessionActive, setSessionActive] = useState(false)
-  const [attendance, setAttendance] = useState({ tutor: false, student: false })
+  const [elapsed, setElapsed] = useState(145)
+  const [sessionActive, setSessionActive] = useState(true)
+  const [attendance, setAttendance] = useState({ tutor: true, student: true })
   const [reportIssue, setReportIssue] = useState(false)
   const [issueText, setIssueText] = useState('')
   const [issueSent, setIssueSent] = useState(false)
-  const [userRole, setUserRole] = useState<'tutor' | 'parent' | 'student'>('parent')
+  const [userRole, setUserRole] = useState<'tutor' | 'parent' | 'student'>('tutor')
 
   // Load booking data
   useEffect(() => {
@@ -101,10 +101,7 @@ export default function LiveSessionPage() {
 
   const handleJoinClass = () => {
     setSessionActive(true)
-    setAttendance(prev => ({ ...prev, student: true }))
-    if (booking?.meet_link) {
-      window.open(booking.meet_link, '_blank')
-    }
+    setAttendance({ tutor: true, student: true })
   }
 
   const handleMarkComplete = async () => {
@@ -219,22 +216,34 @@ export default function LiveSessionPage() {
             ) : (
               <div className="space-y-4">
                 <div className="text-7xl mb-4">📹</div>
-                <h3 className="text-xl font-bold text-green-600">Class In Progress</h3>
-                <p className="text-gray-500 text-sm">
-                  {booking.meet_link
-                    ? 'Your Google Meet session is active in another tab.'
-                    : 'Your session is active. Focus on your learning!'}
+                <h3 className="text-xl font-bold text-green-600">Interactive Live Session Active</h3>
+                <p className="text-gray-500 text-sm max-w-md mx-auto">
+                  Session with <strong>{booking.student_name}</strong> is currently live. Use the Visual Timer and Reward System on the right to interact!
                 </p>
-                {booking.meet_link && (
-                  <a
-                    href={booking.meet_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-blue-100 transition-all"
+                <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setUserRole('tutor')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      userRole !== 'student'
+                        ? 'bg-[#0B2341] text-white shadow-md'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                   >
-                    🔗 Rejoin Meeting
-                  </a>
-                )}
+                    👨‍⚕️ View as Specialist (Send Rewards)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setUserRole('student')}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      userRole === 'student'
+                        ? 'bg-[#D4A017] text-[#0B2341] shadow-md'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    🎓 View as Student (See Stars & Rewards)
+                  </button>
+                </div>
               </div>
             )}
           </div>

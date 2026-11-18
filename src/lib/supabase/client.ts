@@ -7,9 +7,14 @@ function getCookieRole(): string | null {
   return match ? decodeURIComponent(match[1]) : null
 }
 
+let browserClientInstance: SupabaseClient<any, 'public', any> | null = null
+
 export function createClient(): SupabaseClient<any, 'public', any> {
-  return createMockSupabaseClient((): DemoRole => {
-    const pathname = typeof window !== 'undefined' ? window.location.pathname : null
-    return inferRoleFromPath(pathname, getCookieRole())
-  }) as unknown as SupabaseClient<any, 'public', any>
+  if (!browserClientInstance) {
+    browserClientInstance = createMockSupabaseClient((): DemoRole => {
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : null
+      return inferRoleFromPath(pathname, getCookieRole())
+    }) as unknown as SupabaseClient<any, 'public', any>
+  }
+  return browserClientInstance
 }
